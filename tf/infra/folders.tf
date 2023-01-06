@@ -13,8 +13,8 @@ resource "google_folder" "org-dev" {
   parent       = google_folder.org.name
 }
 
-resource "google_folder" "org-live" {
-  display_name = "Live"
+resource "google_folder" "org-prod" {
+  display_name = "Prod"
   parent       = google_folder.org.name
 }
 

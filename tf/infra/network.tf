@@ -4,7 +4,7 @@ module "vpc-host-dev" {
   version = "~> 5.0"
 
   project_id   = module.prj-vpc-host-dev.project_id
-  network_name = "vpc-host-${var.name_dev}"
+  network_name = "vpc-host-${var.name_dev}-${local.suffix}"
   routing_mode = "GLOBAL"
 
   subnets = [
@@ -105,18 +105,18 @@ resource "google_compute_firewall" "vpc-host-dev-allow-icmp" {
 }
 
 # VPC and Subnets
-module "vpc-host-live" {
+module "vpc-host-prod" {
   source  = "terraform-google-modules/network/google"
   version = "~> 5.0"
 
   project_id   = module.prj-vpc-host-prod.project_id
-  network_name = "vpc-host-live"
+  network_name = "vpc-host-prod"
   routing_mode = "GLOBAL"
 
   subnets = [
 
     {
-      subnet_name               = "subnet-live-1"
+      subnet_name               = "subnet-prod-1"
       subnet_ip                 = "10.0.2.0/24"
       subnet_region             = "europe-west1"
       subnet_private_access     = true
@@ -126,7 +126,7 @@ module "vpc-host-live" {
       subnet_flow_logs_interval = "INTERVAL_10_MIN"
     },
     {
-      subnet_name               = "subnet-live-2"
+      subnet_name               = "subnet-prod-2"
       subnet_ip                 = "10.0.4.0/24"
       subnet_region             = "europe-west2"
       subnet_private_access     = true
@@ -139,7 +139,7 @@ module "vpc-host-live" {
 
   routes = [
     {
-      name              = "rt-vpc-host-live-1000-egress-internet-default"
+      name              = "rt-vpc-host-prod-1000-egress-internet-default"
       description       = "Tag based route through IGW to access internet"
       destination_range = "0.0.0.0/0"
       priority          = "1000"
@@ -150,9 +150,9 @@ module "vpc-host-live" {
 }
 
 # Firewall Rules
-resource "google_compute_firewall" "vpc-host-live-allow-iap-rdp" {
-  name      = "vpc-host-live-allow-iap-rdp"
-  network   = module.vpc-host-live.network_name
+resource "google_compute_firewall" "vpc-host-prod-allow-iap-rdp" {
+  name      = "vpc-host-prod-allow-iap-rdp"
+  network   = module.vpc-host-prod.network_name
   project   = module.prj-vpc-host-prod.project_id
   direction = "INGRESS"
   priority  = 10000
@@ -171,9 +171,9 @@ resource "google_compute_firewall" "vpc-host-live-allow-iap-rdp" {
   ]
 }
 
-resource "google_compute_firewall" "vpc-host-live-allow-iap-ssh" {
-  name      = "vpc-host-live-allow-iap-ssh"
-  network   = module.vpc-host-live.network_name
+resource "google_compute_firewall" "vpc-host-prod-allow-iap-ssh" {
+  name      = "vpc-host-prod-allow-iap-ssh"
+  network   = module.vpc-host-prod.network_name
   project   = module.prj-vpc-host-prod.project_id
   direction = "INGRESS"
   priority  = 10000
@@ -192,9 +192,9 @@ resource "google_compute_firewall" "vpc-host-live-allow-iap-ssh" {
   ]
 }
 
-resource "google_compute_firewall" "vpc-host-live-allow-icmp" {
-  name      = "vpc-host-live-allow-icmp"
-  network   = module.vpc-host-live.network_name
+resource "google_compute_firewall" "vpc-host-prod-allow-icmp" {
+  name      = "vpc-host-prod-allow-icmp"
+  network   = module.vpc-host-prod.network_name
   project   = module.prj-vpc-host-prod.project_id
   direction = "INGRESS"
   priority  = 10000
